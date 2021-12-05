@@ -47,6 +47,8 @@ class MainActivity : AppCompatActivity(), MainAdapter.OnPawnItemListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
+
         val isNetworkAvailable = connectivityManager.isNetworkAvailable.value
         if (!isNetworkAvailable) {
             Snackbar.make(
@@ -60,7 +62,6 @@ class MainActivity : AppCompatActivity(), MainAdapter.OnPawnItemListener {
                 Toast.LENGTH_LONG
             ).show()*/
         } else {
-            activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(activityMainBinding.root)
             pawnViewModel.PawnItemsListLiveData.observe(this, Observer { screenState ->
                 processPawnItemResponse(screenState)
