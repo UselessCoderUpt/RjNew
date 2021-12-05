@@ -13,54 +13,89 @@ import com.google.android.material.snackbar.Snackbar
 import com.rj.databinding.ActivityMainBinding
 import com.rj.models.*
 import com.rj.ui.PawnViewModel
+import com.rj.util.ConnectivityManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), MainAdapter.OnPawnItemListener {
 
-//    private val mainViewModel: MainViewModel by lazy {
-//        ViewModelProvider(this).get(MainViewModel::class.java)
-//    }
+    /*       private val mainViewModel: MainViewModel by lazy {
+           ViewModelProvider(this).get(MainViewModel::class.java)
+       }*/
+
+    @Inject
+    lateinit var connectivityManager: ConnectivityManager
     private val pawnViewModel: PawnViewModel by lazy {
         ViewModelProvider(this).get(PawnViewModel::class.java)
     }
-    private lateinit var activityMainBinding : ActivityMainBinding
+    private lateinit var activityMainBinding: ActivityMainBinding
     private lateinit var mainAdapter: MainAdapter
     private lateinit var pawnItemsList: List<PawnItem>
+
     //    private var pawnItemsList: List<PawnItem> = arrayListOf()
+
+    override fun onStart() {
+        super.onStart()
+        connectivityManager.registerConnectionObserver(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        connectivityManager.unregisterConnectionObserver(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(activityMainBinding.root)
-        pawnViewModel.PawnItemsListLiveData.observe(this, Observer { screenState ->
-            processPawnItemResponse(screenState)
-            Toast.makeText(applicationContext, "RAMESH-JEWELERY"+screenState.data?.size, Toast.LENGTH_LONG).show()
-        })
+        val isNetworkAvailable = connectivityManager.isNetworkAvailable.value
+        if (!isNetworkAvailable) {
+            Snackbar.make(
+                findViewById(android.R.id.content),
+                "NO NETWORK AVAILABLE!!!",
+                Snackbar.LENGTH_LONG
+            ).show()
+            /*Toast.makeText(
+                applicationContext,
+                "" + screenState.data?.size,
+                Toast.LENGTH_LONG
+            ).show()*/
+        } else {
+            activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
+            setContentView(activityMainBinding.root)
+            pawnViewModel.PawnItemsListLiveData.observe(this, Observer { screenState ->
+                processPawnItemResponse(screenState)
+                Toast.makeText(
+                    applicationContext,
+                    "RAMESH-JEWELERY" + screenState.data?.size,
+                    Toast.LENGTH_LONG
+                ).show()
+            })
+        }
     }
 
     override fun onPawnItemClick(position: Int) {
-            if (pawnItemsList != null) {
-                try {
-                    val intent = Intent(Intent.ACTION_DIAL)
-                    intent.setData(Uri.parse("tel:"+pawnItemsList.get(position).MobileNo.toString()))
-                    startActivity(intent)
-                }catch (e : Exception){
-                    Toast.makeText(applicationContext, "DialError"+e.message, Toast.LENGTH_LONG).show()
-                    Log.d("rj", e.message.toString())
-                }
+        if (pawnItemsList != null) {
+            try {
+                val intent = Intent(Intent.ACTION_DIAL)
+                intent.setData(Uri.parse("tel:" + pawnItemsList.get(position).MobileNo.toString()))
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(applicationContext, "DialError" + e.message, Toast.LENGTH_LONG)
+                    .show()
+                Log.d("rj", e.message.toString())
             }
+        }
     }
 
-    private fun processPawnItemResponse(screenState: ScreenState<List<PawnItem>?>){
+    private fun processPawnItemResponse(screenState: ScreenState<List<PawnItem>?>) {
         activityMainBinding.progressBar.visibility = View.GONE
-        when(screenState) {
+        when (screenState) {
             is ScreenState.Loading -> {
                 activityMainBinding.progressBar.visibility = View.VISIBLE
             }
             is ScreenState.Success -> {
                 activityMainBinding.progressBar.visibility = View.GONE
-                if (screenState.data != null){
+                if (screenState.data != null) {
                     //assign in pawnItemList for itemclick listener
                     pawnItemsList = screenState.data
                     mainAdapter = MainAdapter(screenState.data, this@MainActivity)
@@ -70,7 +105,11 @@ class MainActivity : AppCompatActivity(), MainAdapter.OnPawnItemListener {
             is ScreenState.Error -> {
                 activityMainBinding.progressBar.visibility = View.GONE
                 val pbParentView = activityMainBinding.progressBar.rootView
-                Snackbar.make(pbParentView, "rjSNACKBAR"+screenState.message!!, Snackbar.LENGTH_LONG).show()
+                Snackbar.make(
+                    pbParentView,
+                    "rjSNACKBAR" + screenState.message!!,
+                    Snackbar.LENGTH_LONG
+                ).show()
             }
         }
 

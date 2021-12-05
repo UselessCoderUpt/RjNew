@@ -6,5 +6,5 @@ import com.squareup.moshi.Json
 // response is returned inside pawnitems array
 data class PawnItemResponse(
     @Json(name = "pawnitems")
-    val result : List<PawnItem>
+    val result: List<PawnItem>
 )
