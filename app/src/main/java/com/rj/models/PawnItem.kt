@@ -25,9 +25,3 @@ data class PawnItem(
     val TotalAmount: Double
     )
 
-//data class PawnItemResponse(@Json(name="results") val result : List<PawnItem>)
-// response is returned inside pawnitems array
-data class PawnItemResponse(
-    @Json(name = "pawnitems")
-    val result : List<PawnItem>
-    )

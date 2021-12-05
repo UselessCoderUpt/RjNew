@@ -1,7 +1,7 @@
 package com.rj.network
 
 import com.rj.models.PawnItemResponse
-import com.rj.util.BASE_URL
+import com.rj.util.Util
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
@@ -17,7 +17,7 @@ object ApiClient {
 
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(Util.BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
     }

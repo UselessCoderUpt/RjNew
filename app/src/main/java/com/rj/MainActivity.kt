@@ -12,11 +12,17 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.rj.databinding.ActivityMainBinding
 import com.rj.models.*
+import com.rj.ui.PawnViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), MainAdapter.OnPawnItemListener {
 
-    private val mainViewModel: MainViewModel by lazy {
-        ViewModelProvider(this).get(MainViewModel::class.java)
+//    private val mainViewModel: MainViewModel by lazy {
+//        ViewModelProvider(this).get(MainViewModel::class.java)
+//    }
+    private val pawnViewModel: PawnViewModel by lazy {
+        ViewModelProvider(this).get(PawnViewModel::class.java)
     }
     private lateinit var activityMainBinding : ActivityMainBinding
     private lateinit var mainAdapter: MainAdapter
@@ -27,9 +33,9 @@ class MainActivity : AppCompatActivity(), MainAdapter.OnPawnItemListener {
         super.onCreate(savedInstanceState)
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
-        mainViewModel.PawnItemsListLiveData.observe(this, Observer { screenState ->
+        pawnViewModel.PawnItemsListLiveData.observe(this, Observer { screenState ->
             processPawnItemResponse(screenState)
-            Toast.makeText(applicationContext, "RAMESH JEWELERY"+screenState.data?.size, Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "RAMESH-JEWELERY"+screenState.data?.size, Toast.LENGTH_LONG).show()
         })
     }
 
@@ -67,6 +73,8 @@ class MainActivity : AppCompatActivity(), MainAdapter.OnPawnItemListener {
                 Snackbar.make(pbParentView, "rjSNACKBAR"+screenState.message!!, Snackbar.LENGTH_LONG).show()
             }
         }
+
+
     }
 
     /*private fun fetchJsonRequest() {
